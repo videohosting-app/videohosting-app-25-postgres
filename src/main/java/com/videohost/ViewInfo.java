@@ -24,7 +24,7 @@ public class ViewInfo {
     private double videoRating;
     private String platform;
     
-
+public ViewInfo() {}
 
 public ViewInfo(String viewer, String producer, LocalDate watchedDate, LocalTime watchedTime, String videoTitle,
                 String videoDuration, String genre, String producerCountry,double videoRating, String platform
