@@ -1,0 +1,9 @@
+com\videohost\Platform.class
+com\videohost\MainApp.class
+com\videohost\ViewerName.class
+com\videohost\ProducerName.class
+com\videohost\Producer.class
+com\videohost\Video.class
+com\videohost\Viewer.class
+com\videohost\ViewInfoDTO.class
+com\videohost\ViewEvent.class
