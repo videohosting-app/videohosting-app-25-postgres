@@ -80,7 +80,8 @@ public class VideohostApplication implements CommandLineRunner {
     }
 
     private void addViewInfoFromCsv() {
-        try (CSVReader reader = new CSVReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream("videohost.csv")))) {
+        try (CSVReader reader = new CSVReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream("videohost.csv"))))
+        {
             List<String[]> records = reader.readAll();
             
             records.remove(0); // Видалити перший рядок з назвами стовпців
