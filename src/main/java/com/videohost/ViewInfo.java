@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 /*
 Колекція, в якій зберігатися документ баз даних MongoDB, що представляє сутність рядку з таблиці з розкладом коледжу.
 */
+
 @Document(collection = "videohost")
 public class ViewInfo {
     @Id
