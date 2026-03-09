@@ -5,7 +5,6 @@ import java.time.LocalTime;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 /*
 Колекція, в якій зберігатися документ баз даних MongoDB, що представляє сутність рядку з таблиці з розкладом коледжу.
 */
@@ -41,14 +40,10 @@ public ViewInfo(String viewer, String producer, LocalDate watchedDate, LocalTime
         this.platform = platform;
     }
 
-
-
     public ViewInfo(String viewer2, String producer2, String string, LocalDate localDate, LocalTime localTime,
         String videoDuration2, String genre2, String producerCountry2, double double1, String platform2) {
     //TODO Auto-generated constructor stub
 }
-
-
 
     public String toString() {
         return "ViewInfo {" +
