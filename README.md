@@ -36,33 +36,81 @@ WARNING: sun.misc.Unsafe::staticFieldBase will be removed in a future release
  =========|_|==============|___/=/_/_/_/
  :: Spring Boot ::                (v2.5.4)
 
-2025-12-01 12:51:28.589  INFO 22928 --- [lication.main()] com.videohost.VideohostApplication       : Starting VideohostApplication using Java 25.0.1 on DESKTOP-ORFHBNQ with PID 22928 (D:\anna4\Collage\2_class_KI-24\Databases(Nochevonv)\videohosting-app-mongodb\target\classes started by anna4 in D:\anna4\Collage\2_class_KI-24\Databases(Nochevonv)\videohosting-app-mongodb)
-2025-12-01 12:51:28.593  INFO 22928 --- [lication.main()] com.videohost.VideohostApplication       : No active profile set, falling back to default profiles: default
-2025-12-01 12:51:28.815  INFO 22928 --- [lication.main()] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
-2025-12-01 12:51:28.844  INFO 22928 --- [lication.main()] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 26 ms. Found 1 MongoDB repository interfaces.
-2025-12-01 12:51:29.320  INFO 22928 --- [lication.main()] org.mongodb.driver.cluster               : Cluster created with settings {hosts=[127.0.0.1:27017], srvHost=cluster0.oqpae1u.mongodb.net, mode=MULTIPLE, requiredClusterType=REPLICA_SET, serverSelectionTimeout='30000 ms', requiredReplicaSetName='atlas-y6dqts-shard-0'}
-2025-12-01 12:51:29.488  INFO 22928 --- [e1u.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017 to client view of cluster
-2025-12-01 12:51:29.544  INFO 22928 --- [e1u.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-jevohhg-shard-00-02.oqpae1u.mongodb.net:27017 to client view of cluster
-2025-12-01 12:51:29.548  INFO 22928 --- [e1u.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017 to client view of cluster
-2025-12-01 12:51:30.845  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:6, serverValue:294542}] to ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017
-2025-12-01 12:51:30.854  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017, type=REPLICA_SET_SECONDARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=747150400, setName='atlas-y6dqts-shard-0', canonicalAddress=ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017, hosts=[ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017, ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017, ac-jevohhg-shard-00-02.oqpae1u.mongodb.net:27017], passives=[], arbiters=[], primary='ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', value='europe-west1-b'}, Tag{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='GCP'}, Tag{name='region', value='WESTERN_EUROPE'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=54, topologyVersion=TopologyVersion{processId=691c9d4f841a000bc371524e, counter=5}, lastWriteDate=Mon Dec 01 12:51:29 EET 2025, lastUpdateTimeNanos=6192949679500}
-2025-12-01 12:51:31.177  INFO 22928 --- [lication.main()] com.videohost.VideohostApplication       : Started VideohostApplication in 2.894 seconds (JVM running for 4.764)
+2025-12-01 12:51:28.589  INFO 22928 --- [lication.main()] com.videohost.VideohostApplication       : Starting VideohostApplication using Java
+ 25.0.1 on DESKTOP-ORFHBNQ with PID 22928 (D:\anna4\Collage\2_class_KI-24\Databases(Nochevonv)\videohosting-app-mongodb\target\classes started
+ by anna4 in D:\anna4\Collage\2_class_KI-24\Databases(Nochevonv)\videohosting-app-mongodb)
+2025-12-01 12:51:28.593  INFO 22928 --- [lication.main()] com.videohost.VideohostApplication       : No active profile set, falling back to
+ default profiles: default
+2025-12-01 12:51:28.815  INFO 22928 --- [lication.main()] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data MongoDB 
+repositories in DEFAULT mode.
+2025-12-01 12:51:28.844  INFO 22928 --- [lication.main()] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning 
+in 26 ms. Found 1 MongoDB repository interfaces.
+2025-12-01 12:51:29.320  INFO 22928 --- [lication.main()] org.mongodb.driver.cluster               : Cluster created with settings {hosts=[127.
+0.0.1:27017], srvHost=cluster0.oqpae1u.mongodb.net, mode=MULTIPLE, requiredClusterType=REPLICA_SET, serverSelectionTimeout='30000 ms',
+requiredReplicaSetName='atlas-y6dqts-shard-0'}
+2025-12-01 12:51:29.488  INFO 22928 --- [e1u.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server
+ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017 to client view of cluster
+2025-12-01 12:51:29.544  INFO 22928 --- [e1u.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server
+ ac-jevohhg-shard-00-02.oqpae1u.mongodb.net:27017 to client view of cluster
+2025-12-01 12:51:29.548  INFO 22928 --- [e1u.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server
+ ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017 to client view of cluster
+2025-12-01 12:51:30.845  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.connection            : Opened connection [connectionId
+{localValue:6, serverValue:294542}] to ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017
+2025-12-01 12:51:30.854  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to 
+server with description ServerDescription{address=ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017, type=REPLICA_SET_SECONDARY,
+ state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, 
+ roundTripTimeNanos=747150400, setName='atlas-y6dqts-shard-0', canonicalAddress=ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017, hosts=
+ [ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017, ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017, ac-jevohhg-shard-00-02.oqpae1u.mongodb.
+ net:27017], passives=[], arbiters=[], primary='ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', 
+ value='europe-west1-b'}, Tag{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='GCP'}, Tag
+ {name='region', value='WESTERN_EUROPE'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=54, 
+ topologyVersion=TopologyVersion{processId=691c9d4f841a000bc371524e, counter=5}, lastWriteDate=Mon Dec 01 12:51:29 EET 2025, 
+ lastUpdateTimeNanos=6192949679500}
+2025-12-01 12:51:31.177  INFO 22928 --- [lication.main()] com.videohost.VideohostApplication       : Started VideohostApplication in 2.894 
+seconds (JVM running for 4.764)
 1. Додати історію переглядів з CSV-файлу
 2. Подивитись історію переглядів
 3. Видалити історію переглядів
 4. Вихід
-Введіть номер команди (1-4): 2025-12-01 12:51:31.238  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:1, serverValue:287637}] to ac-jevohhg-shard-00-02.oqpae1u.mongodb.net:27017
-2025-12-01 12:51:31.238  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:5, serverValue:287638}] to ac-jevohhg-shard-00-02.oqpae1u.mongodb.net:27017
-2025-12-01 12:51:31.238  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:2, serverValue:310683}] to ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017
-2025-12-01 12:51:31.239  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-jevohhg-shard-00-02.oqpae1u.mongodb.net:27017, type=REPLICA_SET_SECONDARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=1143081400, setName='atlas-y6dqts-shard-0', canonicalAddress=ac-jevohhg-shard-00-02.oqpae1u.mongodb.net:27017, hosts=[ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017, ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017, ac-jevohhg-shard-00-02.oqpae1u.mongodb.net:27017], passives=[], arbiters=[], primary='ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', value='europe-west1-d'}, Tag{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='GCP'}, Tag{name='region', value='WESTERN_EUROPE'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=54, topologyVersion=TopologyVersion{processId=691ca4fa5c966ea6788d921f, counter=3}, lastWriteDate=Mon Dec 01 12:51:29 EET 2025, lastUpdateTimeNanos=6193343519300}
-2025-12-01 12:51:31.241  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:3, serverValue:294544}] to ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017
-2025-12-01 12:51:31.252  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:4, serverValue:310688}] to ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017
-2025-12-01 12:51:31.252  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017, type=REPLICA_SET_PRIMARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=1158427700, setName='atlas-y6dqts-shard-0', canonicalAddress=ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017, hosts=[ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017, ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017, ac-jevohhg-shard-00-02.oqpae1u.mongodb.net:27017], passives=[], arbiters=[], primary='ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', value='europe-west1-c'}, Tag{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='GCP'}, Tag{name='region', value='WESTERN_EUROPE'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=7fffffff000000000000011c, setVersion=54, topologyVersion=TopologyVersion{processId=691ca0219a48975c966a2722, counter=6}, lastWriteDate=Mon Dec 01 12:51:29 EET 2025, lastUpdateTimeNanos=6193358896100}
-2025-12-01 12:51:31.253  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Setting max election id to 7fffffff000000000000011c from replica set primary ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017
-2025-12-01 12:51:31.254  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Setting max set version to 54 from replica set primary ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017
-2025-12-01 12:51:31.254  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Discovered replica set primary ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017
+Введіть номер команди (1-4): 2025-12-01 12:51:31.238  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.connection            : Opened 
+connection [connectionId{localValue:1, serverValue:287637}] to ac-jevohhg-shard-00-02.oqpae1u.mongodb.net:27017
+2025-12-01 12:51:31.238  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.connection            : Opened connection [connectionId
+{localValue:5, serverValue:287638}] to ac-jevohhg-shard-00-02.oqpae1u.mongodb.net:27017
+2025-12-01 12:51:31.238  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.connection            : Opened connection [connectionId
+{localValue:2, serverValue:310683}] to ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017
+2025-12-01 12:51:31.239  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to 
+server with description ServerDescription{address=ac-jevohhg-shard-00-02.oqpae1u.mongodb.net:27017, type=REPLICA_SET_SECONDARY, 
+state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, 
+roundTripTimeNanos=1143081400, setName='atlas-y6dqts-shard-0', canonicalAddress=ac-jevohhg-shard-00-02.oqpae1u.mongodb.net:27017, hosts=
+[ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017, ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017, ac-jevohhg-shard-00-02.oqpae1u.mongodb.
+net:27017], passives=[], arbiters=[], primary='ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', 
+value='europe-west1-d'}, Tag{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='GCP'}, Tag
+{name='region', value='WESTERN_EUROPE'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=54, 
+topologyVersion=TopologyVersion{processId=691ca4fa5c966ea6788d921f, counter=3}, lastWriteDate=Mon Dec 01 12:51:29 EET 2025, 
+lastUpdateTimeNanos=6193343519300}
+2025-12-01 12:51:31.241  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.connection            : Opened connection [connectionId
+{localValue:3, serverValue:294544}] to ac-jevohhg-shard-00-00.oqpae1u.mongodb.net:27017
+2025-12-01 12:51:31.252  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.connection            : Opened connection [connectionId
+{localValue:4, serverValue:310688}] to ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017
+2025-12-01 12:51:31.252  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to 
+server with description ServerDescription{address=ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017, type=REPLICA_SET_PRIMARY, state=CONNECTED, 
+ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=1158427700, 
+setName='atlas-y6dqts-shard-0', canonicalAddress=ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017, hosts=[ac-jevohhg-shard-00-00.oqpae1u.
+mongodb.net:27017, ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017, ac-jevohhg-shard-00-02.oqpae1u.mongodb.net:27017], passives=[], arbiters=
+[], primary='ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', value='europe-west1-c'}, Tag
+{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='GCP'}, Tag{name='region', 
+value='WESTERN_EUROPE'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=7fffffff000000000000011c, setVersion=54, 
+topologyVersion=TopologyVersion{processId=691ca0219a48975c966a2722, counter=6}, lastWriteDate=Mon Dec 01 12:51:29 EET 2025, 
+lastUpdateTimeNanos=6193358896100}
+2025-12-01 12:51:31.253  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Setting max election id to 
+7fffffff000000000000011c from replica set primary ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017
+2025-12-01 12:51:31.254  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Setting max set version to 54 from 
+replica set primary ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017
+2025-12-01 12:51:31.254  INFO 22928 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Discovered replica set primary 
+ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017
 1
-2025-12-01 12:51:54.567  INFO 22928 --- [lication.main()] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:7, serverValue:310667}] to ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017
+2025-12-01 12:51:54.567  INFO 22928 --- [lication.main()] org.mongodb.driver.connection            : Opened connection [connectionId
+{localValue:7, serverValue:310667}] to ac-jevohhg-shard-00-01.oqpae1u.mongodb.net:27017
 12 документів з рядками з історії перегляду завантажено з CSV.
 1. Додати історію переглядів з CSV-файлу
 2. Подивитись історію переглядів
