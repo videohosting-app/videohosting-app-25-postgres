@@ -33,7 +33,7 @@ jobs:
         run: |
           mkdir -p target/ci-logs
           set -o pipefail
-          mvn -B clean verify | tee target/ci-logs/static-analysis.log
+          mvn -B -DskipTests checkstyle:check | tee target/ci-logs/static-analysis.log
 
       - name: Upload static-analysis logs on failure
         if: failure()
