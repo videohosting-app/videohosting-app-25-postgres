@@ -41,7 +41,7 @@ jobs:
         with:
           name: static-analysis-logs
           path: target/ci-logs/**
-          if-no-files-found: warn
+          if-no-files-found: ignore
 
   # Stage 2: compile/package artifact only if static analysis passed.
   build:
@@ -73,7 +73,7 @@ jobs:
         with:
           name: build-artifacts
           path: target/*.jar
-          if-no-files-found: warn
+          if-no-files-found: ignore
 
       - name: Upload test reports
         if: always()
@@ -81,7 +81,7 @@ jobs:
         with:
           name: unit-test-reports
           path: target/surefire-reports/**
-          if-no-files-found: warn
+          if-no-files-found: ignore
 
       - name: Upload coverage reports
         if: always()
@@ -91,7 +91,7 @@ jobs:
           path: |
             target/site/jacoco/**
             target/jacoco.exec
-          if-no-files-found: warn
+          if-no-files-found: ignore
 
       - name: Print coverage summary in build logs
         if: always()
@@ -130,4 +130,4 @@ jobs:
         with:
           name: build-logs
           path: target/ci-logs/**
-          if-no-files-found: warn
+          if-no-files-found: ignore
