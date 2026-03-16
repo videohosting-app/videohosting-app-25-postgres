@@ -12,9 +12,12 @@
     <!-- Build / resources encoding -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+<<<<<<< HEAD
     <!-- Java version -->
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
+=======
+>>>>>>> 939593357d515f8090bb87c3c848edea6ba7c9af
   </properties>
 
   <dependencies>
