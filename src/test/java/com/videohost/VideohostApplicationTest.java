@@ -113,7 +113,17 @@ class VideohostApplicationTest {
 
         assertTrue(outputStreamState.value().contains("некоректний"));
     }
+@Test
+    void runWithCsvChoiceLoadsDataAndStops() throws Exception {
+        ViewInfoRepository repository = mock(ViewInfoRepository.class);
+        VideohostApplication app = appWithRepository(repository);
+        inputStreamState.replace("1\n2\nx\n");
 
+        assertThrows(NoSuchElementException.class, () -> app.run());
+
+        verify(repository, times(1)).saveAll(anyList());
+        verify(repository, times(1)).findAll();
+    }
     private static VideohostApplication appWithRepository(ViewInfoRepository repository) throws Exception {
         VideohostApplication app = new VideohostApplication();
         Field field = VideohostApplication.class.getDeclaredField("viewInfoRepository");
