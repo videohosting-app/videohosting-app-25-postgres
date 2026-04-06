@@ -1,44 +1,40 @@
 package com.videohost;
 
 import java.io.InputStreamReader;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 
 import com.opencsv.CSVReader;
 
 /**
- * Додаток для редагування бази даних розкладу коледжу.
+ * Веб-додаток для перегляду та редагування таблиці відеохостингу.
  *
  * @SpringBootApplication - анотація для позначення головного класу Spring Boot додатку.
  *
- * Клас реалізує CommandLineRunner для виконання коду після запуску додатку.
- *
  * Методи:
- * - main(String[] args): запускає додаток Spring Boot.
- * - run(String... args): метод, що виконується після запуску додатку. Виводить меню для користувача.
- * - addViewInfoFromCsv(): додає розклад з CSV-файлу до бази даних.
- * - viewAllViewInfo(): виводить всі розклади з бази даних.
- * - dropAllViewInfo(): видаляє всі розклади з бази даних.
+ * - main(String[] args): запускає додаток Spring Boot з вбудованим веб-сервером.
+ * - onApplicationReady(): завантажує дані з CSV після старту, якщо база порожня.
+ * - addViewInfoFromCsv(): додає дані перегляду з CSV-файлу до бази даних.
+ * - viewAllViewInfo(): виводить всі записи перегляду з бази даних.
+ * - dropAllViewInfo(): видаляє всі записи перегляду з бази даних.
  *
  * Поля:
- * - scheduleRepository: репозиторій для роботи з розкладами.
+ * - viewInfoRepository: репозиторій для роботи з даними відеохостингу.
  *
  * Використовує:
- * - Scanner для зчитування вводу користувача.
  * - CSVReader для зчитування даних з CSV-файлу.
- * - ViewInfo для представлення документу розкладу.
+ * - ViewInfo для представлення документу перегляду.
  * - ViewInfoRepository для взаємодії з базою даних.
  */
 @SpringBootApplication
-public class VideohostApplication implements CommandLineRunner {
+public class VideohostApplication {
 
     @Autowired
     private ViewInfoRepository viewInfoRepository;
@@ -47,43 +43,20 @@ public class VideohostApplication implements CommandLineRunner {
         SpringApplication.run(VideohostApplication.class, args);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-        Scanner scanner = new Scanner(System.in);
-
-        while (true) {
-            System.out.println("1. Додати історію переглядів з CSV-файлу");
-            System.out.println("2. Подивитись історію переглядів");
-            System.out.println("3. Видалити історію переглядів");
-            System.out.println("4. Вихід");
-            System.out.print("Введіть номер команди (1-4): ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (choice) {
-                case 1:
-                    addViewInfoFromCsv();
-                    break;
-                case 2:
-                    viewAllViewInfo();
-                    break;
-                case 3:
-                    dropAllViewInfo();
-                    break;
-                case 4:
-                    System.exit(0);
-                    break;
-                default:
-                    System.out.println("Номер команди некоректний. Спробуй ще.");
-            }
+    @EventListener(ApplicationReadyEvent.class)
+    public void onApplicationReady() {
+        if (viewInfoRepository.count() == 0) {
+            addViewInfoFromCsv();
         }
     }
 
     private void addViewInfoFromCsv() {
-        try (CSVReader reader = new CSVReader
-            (new InputStreamReader(getClass().getClassLoader().getResourceAsStream("videohost.csv")))) {
+        try (CSVReader reader = new CSVReader(new InputStreamReader(
+            getClass().getClassLoader().getResourceAsStream("videohost.csv"),
+            StandardCharsets.UTF_8)
+        )) {
             List<String[]> records = reader.readAll();
-            
+
             records.remove(0); // Видалити перший рядок з назвами стовпців
 
             List<ViewInfo> viewInfoList = new ArrayList<>();
@@ -91,21 +64,22 @@ public class VideohostApplication implements CommandLineRunner {
                 ViewInfo viewInfo = new ViewInfo(
                     record[0], // viewer
                     record[1], // producer
-                    LocalDate.parse(record[2]), //watchedDate
-                    LocalTime.parse(record[3]), //watchedTime
+                    record[2], // watchedDate
+                    record[3], // watchedTime
                     record[4], // videoTitle
                     record[5], // videoDuration
                     record[6], // genre
                     record[7], // producerCountry
                     Double.parseDouble(record[8]), // videoRating
-                    record[9] // platform
-                    );
-
+                    record[9]  // platform
+                );
                 viewInfoList.add(viewInfo);
             }
-            
+
+            viewInfoRepository.deleteAll();
             viewInfoRepository.saveAll(viewInfoList);
-            System.out.println(viewInfoList.size() + " документів з рядками з історії перегляду завантажено з CSV.");
+            System.out.println(viewInfoList.size()
+                + " документів з рядками з історії перегляду завантажено з CSV.");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Не вдалось завантажити рядок історії перегляду з CSV.");
