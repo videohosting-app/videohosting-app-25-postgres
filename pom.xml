@@ -18,9 +18,9 @@
 
   <!-- SCM Information -->
   <scm>
-    <connection>scm:git:https://github.com/chdbc-samples/college-schedule-app-25.git</connection>
-    <developerConnection>scm:git:https://github.com/chdbc-samples/college-schedule-app-25.git</developerConnection>
-    <url>https://github.com/chdbc-samples/college-schedule-app-25</url>
+    <connection>scm:git:https://github.com/videohosting-app/videohosting-app-25-postgres.git</connection>
+    <developerConnection>scm:git:https://github.com/videohosting-app/videohosting-app-25-postgres.git</developerConnection>
+    <url>https://github.com/videohosting-app/videohosting-app-25-postgres</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -57,7 +57,7 @@
     <repository>
       <id>github</id>
       <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/chdbc-samples/college-schedule-app-25</url>
+      <url>https://maven.pkg.github.com/videohosting-app/videohosting-app-25-postgres</url>
     </repository>
   </distributionManagement>
 
