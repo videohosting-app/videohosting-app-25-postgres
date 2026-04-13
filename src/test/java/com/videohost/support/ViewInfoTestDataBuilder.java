@@ -1,15 +1,12 @@
 package com.videohost.support;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 import com.videohost.ViewInfo;
 
 public final class ViewInfoTestDataBuilder {
     private String viewer = "Коваленко Олег Іванович";
     private String producer = "Петренко Ірина Василівна";
-    private LocalDate watchedDate = LocalDate.of(2024, 9, 14);
-    private LocalTime watchedTime = LocalTime.of(20, 30, 0);
+    private String watchedDate = "2024-09-14";
+    private String watchedTime = "20:30:00";
     private String videoTitle = "Весняний ранок";
     private String videoDuration = "00:15:45";
     private String genre = "Драма";
@@ -31,12 +28,12 @@ public final class ViewInfoTestDataBuilder {
         return this;
     }
 
-    public ViewInfoTestDataBuilder withWatchedDate(LocalDate value) {
+    public ViewInfoTestDataBuilder withWatchedDate(String value) {
         this.watchedDate = value;
         return this;
     }
 
-    public ViewInfoTestDataBuilder withWatchedTime(LocalTime value) {
+    public ViewInfoTestDataBuilder withWatchedTime(String value) {
         this.watchedTime = value;
         return this;
     }

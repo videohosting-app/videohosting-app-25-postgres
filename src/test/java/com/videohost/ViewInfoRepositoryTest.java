@@ -1,10 +1,10 @@
 package com.videohost;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.mongodb.repository.MongoRepository;
 

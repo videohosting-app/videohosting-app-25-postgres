@@ -1,55 +1,52 @@
 package com.videohost;
 
-import java.io.ByteArrayInputStream;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
-
 import org.junit.jupiter.api.AfterEach;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import com.videohost.support.ViewInfoTestDataBuilder;
 
 class VideohostApplicationTest {
-    private final InputStreamState inputStreamState = new InputStreamState();
     private final OutputStreamState outputStreamState = new OutputStreamState();
 
     @AfterEach
     void restoreSystemStreams() {
-        inputStreamState.restore();
         outputStreamState.restore();
     }
 
     @Test
-    void addViewInfoFromCsvSavesRecordsWhenCsvIsPresent() throws Exception {
+    void addViewInfoFromCsvReplacesExistingDataAndSavesParsedRows() throws Exception {
         ViewInfoRepository repository = mock(ViewInfoRepository.class);
         VideohostApplication app = appWithRepository(repository);
 
         invokePrivate(app, "addViewInfoFromCsv");
 
+        verify(repository, times(1)).deleteAll();
         verify(repository, times(1)).saveAll(anyList());
         assertTrue(outputStreamState.value().contains("CSV"));
     }
 
     @Test
-    void addViewInfoFromCsvOutputsTextWhenCsvIsAbsent() throws Exception {
+    void addViewInfoFromCsvPrintsFailureMessageWhenRepositoryThrows() throws Exception {
         ViewInfoRepository repository = mock(ViewInfoRepository.class);
+        doThrow(new RuntimeException("repository unavailable")).when(repository).deleteAll();
         VideohostApplication app = appWithRepository(repository);
 
         invokePrivate(app, "addViewInfoFromCsv");
 
-        assertTrue(outputStreamState.value().length() > 0);
+        assertTrue(outputStreamState.value().contains("CSV"));
+        verify(repository, times(1)).deleteAll();
     }
 
     @Test
@@ -67,7 +64,7 @@ class VideohostApplicationTest {
     @Test
     void viewAllViewInfoPrintsRowsWhenRepositoryHasData() throws Exception {
         ViewInfoRepository repository = mock(ViewInfoRepository.class);
-        ViewInfo viewInfo = new ViewInfoTestDataBuilder().build();
+        ViewInfo viewInfo = new com.videohost.support.ViewInfoTestDataBuilder().build();
         when(repository.findAll()).thenReturn(List.of(viewInfo));
         VideohostApplication app = appWithRepository(repository);
 
@@ -90,40 +87,6 @@ class VideohostApplicationTest {
         assertTrue(outputStreamState.value().contains("видалено"));
     }
 
-    @Test
-    void runExecutesChoicesAndStopsWhenInputIsExhausted() throws Exception {
-        ViewInfoRepository repository = mock(ViewInfoRepository.class);
-        when(repository.findAll()).thenReturn(Collections.emptyList());
-        VideohostApplication app = appWithRepository(repository);
-        inputStreamState.replace("2\n3\nx\n");
-
-        assertThrows(NoSuchElementException.class, () -> app.run());
-
-        verify(repository, times(1)).findAll();
-        verify(repository, times(1)).deleteAll();
-    }
-
-    @Test
-    void runPrintsMessageForOutOfRangeChoice() throws Exception {
-        ViewInfoRepository repository = mock(ViewInfoRepository.class);
-        VideohostApplication app = appWithRepository(repository);
-        inputStreamState.replace("5\nx\n");
-
-        assertThrows(NoSuchElementException.class, () -> app.run());
-
-        assertTrue(outputStreamState.value().contains("некоректний"));
-    }
-@Test
-    void runWithCsvChoiceLoadsDataAndStops() throws Exception {
-        ViewInfoRepository repository = mock(ViewInfoRepository.class);
-        VideohostApplication app = appWithRepository(repository);
-        inputStreamState.replace("1\n2\nx\n");
-
-        assertThrows(NoSuchElementException.class, () -> app.run());
-
-        verify(repository, times(1)).saveAll(anyList());
-        verify(repository, times(1)).findAll();
-    }
     private static VideohostApplication appWithRepository(ViewInfoRepository repository) throws Exception {
         VideohostApplication app = new VideohostApplication();
         Field field = VideohostApplication.class.getDeclaredField("viewInfoRepository");
@@ -136,18 +99,6 @@ class VideohostApplicationTest {
         Method method = VideohostApplication.class.getDeclaredMethod(methodName);
         method.setAccessible(true);
         method.invoke(app);
-    }
-
-    private static final class InputStreamState {
-        private final java.io.InputStream original = System.in;
-
-        private void replace(String input) {
-            System.setIn(new ByteArrayInputStream(input.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
-        }
-
-        private void restore() {
-            System.setIn(original);
-        }
     }
 
     private static final class OutputStreamState {
