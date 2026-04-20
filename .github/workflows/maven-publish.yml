@@ -36,6 +36,6 @@ jobs:
 
     # Крок 3: Публікація артефактів в GitHub Packages
     - name: Publish to GitHub Packages
-      run: mvn --batch-mode deploy --file pom.xml -DskipTests
+      run: mvn --batch-mode deploy --file pom.xml -DskipUnitTests=true -DskipIntegrationTests=true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
