@@ -241,7 +241,7 @@
                 <rule>
                   <element>CLASS</element>
                   <includes>
-                    <include>com.college.Schedule</include>
+                    <include>com.videohost.ViewInfo</include>
                   </includes>
                   <limits>
                     <limit>
@@ -254,7 +254,7 @@
                 <rule>
                   <element>CLASS</element>
                   <includes>
-                    <include>com.college.ScheduleController</include>
+                    <include>com.videohost.ViewInfoController</include>
                   </includes>
                   <limits>
                     <limit>

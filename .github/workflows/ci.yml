@@ -207,8 +207,8 @@ jobs:
           }
 
           echo "## Integration Test Coverage" >> "$GITHUB_STEP_SUMMARY"
-          print_class_coverage "com.college.Schedule"
-          print_class_coverage "com.college.ScheduleController"
+          print_class_coverage "com.videohost.ViewInfo"
+          print_class_coverage "com.videohost.ViewInfoController"
 
       - name: Upload integration logs on failure
         if: failure()
