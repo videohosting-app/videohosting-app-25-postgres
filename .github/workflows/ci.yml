@@ -136,5 +136,8 @@ jobs:
   publish:
     name: Publish Package
     needs: build
+    permissions:
+      contents: read
+      packages: write
     uses: ./.github/workflows/maven-publish.yml
     secrets: inherit
