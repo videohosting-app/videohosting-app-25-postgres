@@ -261,7 +261,6 @@ jobs:
     secrets: inherit
 
   # Етап 6: опублікувати Docker-образ лише після успішного завершення етапу збірки
-
   publish-docker:
     name: Publish Docker Image
     needs: build
@@ -269,9 +268,9 @@ jobs:
       contents: read
       packages: write
     uses: ./.github/workflows/docker-publish.yml
-    secrets: inherit
+secrets: inherit
 
-  # Етап 7: виконати деплой у Render для pull request після успішної публікації образу Docker-контейнера.
+# Етап 7: виконати деплой у Render для pull request після успішної публікації образу Docker-контейнера.
   deploy-render-pr:
     name: Deploy Render PR
     needs: publish-docker
