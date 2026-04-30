@@ -1,7 +1,6 @@
 name: Render Deploy
 
 on:
-  # Дозволяє викликати workflow з інших workflow, наприклад із CI для деплою з pull request.
   workflow_call:
 
   # Дозволяє вручну запустити деплой із вказаним тегом образу Docker-контейнера.
