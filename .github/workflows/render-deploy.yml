@@ -73,12 +73,12 @@ jobs:
         shell: bash
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+          RENDER_SERVISE_ID: ${{ secrets.RENDER_SERVISE_ID }}
         run: |
           missing=()
 
           [[ -z "$RENDER_API_KEY" ]] && missing+=("RENDER_API_KEY")
-          [[ -z "$RENDER_SERVICE_ID" ]] && missing+=("RENDER_SERVISE_ID")
+          [[ -z "$RENDER_SERVISE_ID" ]] && missing+=("RENDER_SERVISE_ID")
 
           if (( ${#missing[@]} > 0 )); then
             printf 'Missing required GitHub Actions secrets: %s\n' "${missing[*]}" >&2
