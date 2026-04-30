@@ -76,6 +76,7 @@ jobs:
           RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
         run: |
           missing=()
+
           [[ -z "$RENDER_API_KEY" ]] && missing+=("RENDER_API_KEY")
           [[ -z "$RENDER_SERVICE_ID" ]] && missing+=("RENDER_SERVICE_ID")
 
