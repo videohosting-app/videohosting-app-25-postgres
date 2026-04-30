@@ -78,7 +78,7 @@ jobs:
           missing=()
 
           [[ -z "$RENDER_API_KEY" ]] && missing+=("RENDER_API_KEY")
-          [[ -z "$RENDER_SERVICE_ID" ]] && missing+=("RENDER_SERVICE_ID")
+          [[ -z "$RENDER_SERVICE_ID" ]] && missing+=("RENDER_SERVISE_ID")
 
           if (( ${#missing[@]} > 0 )); then
             printf 'Missing required GitHub Actions secrets: %s\n' "${missing[*]}" >&2
