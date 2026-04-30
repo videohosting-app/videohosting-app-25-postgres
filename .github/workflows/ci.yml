@@ -8,7 +8,7 @@ on:
     branches: [main, release/*]
 
 jobs:
-   # Етап 1: виконати перевірки статичного аналізу перед тестуванням або пакуванням.
+  # Етап 1: виконати перевірки статичного аналізу перед тестуванням або пакуванням.
   static-analysis:
     name: Static Analysis
     runs-on: ubuntu-latest
@@ -24,7 +24,7 @@ jobs:
           java-version: "17"
           cache: maven
 
-      - name: Run static analysis 
+      - name: Run static analysis
         shell: bash
         run: |
           mkdir -p target/ci-logs
@@ -268,4 +268,14 @@ jobs:
       contents: read
       packages: write
     uses: ./.github/workflows/docker-publish.yml
+    secrets: inherit
+
+# Етап 7: виконати деплой у Render для pull request після успішної публікації образу Docker-контейнера.
+  deploy-render-pr:
+    name: Deploy Render PR
+    needs: publish-docker
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/render-deploy.yml
     secrets: inherit
