@@ -121,7 +121,7 @@ jobs:
           RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
           DEPLOY_ID: ${{ steps.deploy.outputs.deploy_id }}
         run: |
-          for attempt in {1..40}; do
+          for attempt in {1..80}; do
             response="$(
               curl --silent --show-error --fail-with-body \
                 --request GET \
