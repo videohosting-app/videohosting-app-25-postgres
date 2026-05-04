@@ -19,11 +19,14 @@ jobs:
     name: Run E2E UI Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
+
     services:
       selenium:
         image: selenium/standalone-chromium:latest
         ports:
           - 4444:4444
+        options: >-
+          --shm-size=2gb
 
     steps:
       - name: Checkout repository
@@ -32,22 +35,22 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
-          java-version: "17"
-          cache: maven
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
 
-      - name: Prepare artifact directories
-        shell: bash
-        run: mkdir -p target/ci-logs target/e2e-artifacts/videos target/e2e-artifacts/screenshots
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y jq curl
 
       - name: Run E2E UI tests
         shell: bash
         env:
           E2E_BASE_URL: ${{ inputs.application_url }}
           E2E_ARTIFACTS_DIR: target/e2e-artifacts
+          MAVEN_OPTS: "-Xmx2048m"
         run: |
           chmod +x .github/workflows/scripts/run-e2e-test.sh
-          .github/workflows/scripts/run-e2e-test.sh
+          ./.github/workflows/scripts/run-e2e-test.sh
 
       - name: Upload E2E reports and media
         if: always()

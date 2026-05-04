@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Готуємо директорії
 mkdir -p target/ci-logs target/e2e-artifacts/videos target/e2e-artifacts/screenshots
 LOG_FILE="target/ci-logs/e2e-ui-tests.log"
 
@@ -10,27 +11,16 @@ log() {
 
 : > "$LOG_FILE"
 
-# Чекаємо готовності Selenium Grid.
+log "Waiting for Selenium Grid..."
 for attempt in {1..90}; do
-  ready_response="$(
-    curl --silent --show-error \
-      --connect-timeout 2 \
-      --max-time 10 \
-      http://127.0.0.1:4444/status
-  )" || ready_response=""
-
-  if [[ -n "$ready_response" ]]; then
-    ready="$(jq -r '.value.ready // false' <<<"$ready_response" 2>/dev/null)" || ready="false"
-  else
-    ready="false"
-  fi
+  ready_response="$(curl --silent --connect-timeout 2 http://127.0.0.1:4444/status || echo "")"
+  ready="$(echo "$ready_response" | jq -r '.value.ready // false' 2>/dev/null || echo "false")"
 
   if [[ "$ready" == "true" ]]; then
     log "Selenium Grid reported ready on attempt ${attempt}."
     break
   fi
-
-  log "Selenium Grid not ready on attempt ${attempt}."
+  log "Selenium Grid not ready on attempt ${attempt}..."
   sleep 2
 done
 
@@ -39,76 +29,45 @@ if [[ "${ready:-false}" != "true" ]]; then
   exit 1
 fi
 
+log "Creating Selenium session..."
 SESSION_ID=""
 CDP_URL=""
 
-for attempt in {1..30}; do
-  tmp_response_file="$(mktemp)"
-  http_code="$(
-    curl --silent --show-error \
-      --connect-timeout 2 \
-      --max-time 15 \
-      --output "$tmp_response_file" \
-      --write-out "%{http_code}" \
-      --request POST \
-      --url http://127.0.0.1:4444/session \
-      --header "Content-Type: application/json" \
-      --data '{
-        "capabilities": {
-          "alwaysMatch": {
-            "browserName": "chrome",
-            "goog:chromeOptions": {
-              "args": ["--headless=new", "--disable-dev-shm-usage", "--no-sandbox"]
-            }
-          }
-        }
-      }'
-  )" || http_code="curl_failed"
+for attempt in {1..10}; do
+  response="$(curl --silent --request POST --url http://127.0.0.1:4444/session \
+    --header "Content-Type: application/json" \
+    --data '{"capabilities": {"alwaysMatch": {"browserName": "chrome", "goog:chromeOptions": {"args": ["--headless=new", "--disable-dev-shm-usage", "--no-sandbox"]}}}}')"
+  
+  SESSION_ID="$(echo "$response" | jq -r '.value.sessionId // empty')"
+  CDP_URL="$(echo "$response" | jq -r '.value.capabilities["se:cdp"] // empty')"
 
-  response="$(cat "$tmp_response_file")"
-  rm -f "$tmp_response_file"
-
-  if [[ "$http_code" == "200" ]]; then
-    SESSION_ID="$(jq -r '.value.sessionId // empty' <<<"$response")"
-    CDP_URL="$(jq -r '.value.capabilities["se:cdp"] // empty' <<<"$response")"
-    if [[ -n "$SESSION_ID" && -n "$CDP_URL" ]]; then
-      log "Created Selenium session on attempt ${attempt}."
-      break
-    fi
-    log "Selenium session response on attempt ${attempt} did not contain session metadata."
-    log "$response"
-  else
-    log "Selenium session creation attempt ${attempt} failed with status ${http_code}."
-    if [[ -n "$response" ]]; then
-      log "$response"
-    fi
+  if [[ -n "$SESSION_ID" && -n "$CDP_URL" ]]; then
+    log "Created Selenium session on attempt ${attempt}."
+    break
   fi
-
   sleep 2
 done
 
-if [[ -z "$SESSION_ID" || -z "$CDP_URL" ]]; then
-  log "Unable to resolve Selenium session metadata after retries."
+if [[ -z "$SESSION_ID" ]]; then
+  log "Failed to create Selenium session."
   exit 1
 fi
 
-cleanup() {
-  if [[ -n "${SESSION_ID:-}" ]]; then
-    curl --silent --show-error --fail-with-body \
-      --request DELETE \
-      --url "http://127.0.0.1:4444/session/${SESSION_ID}" >/dev/null || true
-  fi
-}
-
-trap cleanup EXIT
-
+# Витягуємо шлях CDP і формуємо URL для локального runner-а
 CDP_PATH="${CDP_URL#ws://*/}"
 export E2E_SELENIUM_CDP_URL="ws://127.0.0.1:4444/${CDP_PATH}"
-export E2E_ARTIFACTS_DIR="${E2E_ARTIFACTS_DIR:-target/e2e-artifacts}"
 
 log "Resolved Playwright CDP endpoint: ${E2E_SELENIUM_CDP_URL}"
-log "Starting Maven E2E UI test run."
 
-set -o pipefail
+cleanup() {
+  log "Cleaning up Selenium session ${SESSION_ID}..."
+  curl --silent -X DELETE "http://127.0.0.1:4444/session/${SESSION_ID}" > /dev/null || true
+}
+trap cleanup EXIT
+
+log "Starting Maven E2E UI test run."
 mvn -B -P e2e-ui -Dcheckstyle.skip=true -DskipUnitTests=true -DskipIntegrationTests=true verify \
+  -Dselenium.session.id="$SESSION_ID" \
+  -Dplaywright.cdp.endpoint="$E2E_SELENIUM_CDP_URL" \
+  -Dapplication.url="$E2E_BASE_URL" \
   | tee -a "$LOG_FILE"
