@@ -1,133 +1,68 @@
-#!/usr/bin/env bash
-set -euo pipefail
+name: run-e2e-test
 
-# Готуємо директорії для логів Maven і артефактів Playwright.
-mkdir -p target/ci-logs target/e2e-artifacts/videos target/e2e-artifacts/screenshots
-LOG_FILE="target/ci-logs/e2e-ui-tests.log"
+on:
+  workflow_call:
+    inputs:
+      application_url:
+        description: Deployed application base URL for UI tests
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      application_url:
+        description: Deployed application base URL for UI tests
+        required: true
+        type: string
 
-log() {
-  echo "$1" | tee -a "$LOG_FILE"
-}
+jobs:
+  e2e-ui-tests:
+    name: Run E2E UI Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
 
-# Очищаємо лог на початку кожного прогону, щоб артефакт містив лише актуальний запуск.
-: > "$LOG_FILE"
+    services:
+      selenium:
+        # Standalone Chromium вже містить драйвер і браузер
+        image: selenium/standalone-chromium:latest
+        ports:
+          - 4444:4444
+        # Додаткові налаштування для стабільності контейнера в CI
+        options: >-
+          --shm-size=2gb
 
-# Чекаємо, поки Selenium почне стабільно відповідати на /status після старту контейнера.
-for attempt in {1..90}; do
-  # Читаємо статус Grid з окремими timeout, щоб короткі мережеві збої не валили весь скрипт.
-  ready_response="$(
-    curl --silent --show-error \
-      --connect-timeout 2 \
-      --max-time 10 \
-      http://127.0.0.1:4444/status
-  )" || ready_response=""
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  # Якщо відповідь є, намагаємось витягнути прапорець готовності з JSON.
-  if [[ -n "$ready_response" ]]; then
-    ready="$(jq -r '.value.ready // false' <<<"$ready_response" 2>/dev/null)" || ready="false"
-  else
-    ready="false"
-  fi
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
 
-  # Коли Grid готовий, можна переходити до створення браузерної сесії.
-  if [[ "$ready" == "true" ]]; then
-    log "Selenium Grid reported ready on attempt ${attempt}."
-    break
-  fi
+      # Встановлюємо jq, оскільки твій скрипт його активно використовує
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y jq
 
-  # Логуємо повторну спробу, щоб у CI було видно, чи є повільний старт Selenium.
-  log "Selenium Grid not ready on attempt ${attempt}."
-  sleep 2
-done
+      - name: Run E2E UI tests
+        shell: bash
+        env:
+          E2E_BASE_URL: ${{ inputs.application_url }}
+          E2E_ARTIFACTS_DIR: target/e2e-artifacts
+          # Важливо для Maven у середовищі GitHub Actions
+          MAVEN_OPTS: "-Xmx2048m"
+        run: |
+          chmod +x .github/workflows/scripts/run-e2e-test.sh
+          ./.github/workflows/scripts/run-e2e-test.sh
 
-# Якщо навіть після всіх спроб Selenium не готовий, завершуємо прогін явною помилкою.
-if [[ "${ready:-false}" != "true" ]]; then
-  log "Selenium Grid did not become ready in time."
-  exit 1
-fi
-
-# Відкриваємо Selenium session і дістаємо CDP endpoint для Playwright.
-SESSION_ID=""
-CDP_URL=""
-
-for attempt in {1..30}; do
-  # Тимчасовий файл потрібен, щоб окремо зчитати тіло відповіді і HTTP-код від curl.
-  tmp_response_file="$(mktemp)"
-  http_code="$(
-    curl --silent --show-error \
-      --connect-timeout 2 \
-      --max-time 15 \
-      --output "$tmp_response_file" \
-      --write-out "%{http_code}" \
-      --request POST \
-      --url http://127.0.0.1:4444/session \
-      --header "Content-Type: application/json" \
-      --data '{
-        "capabilities": {
-          "alwaysMatch": {
-            "browserName": "chrome",
-            "goog:chromeOptions": {
-              "args": ["--headless=new", "--disable-dev-shm-usage", "--no-sandbox"]
-            }
-          }
-        }
-      }'
-  )" || http_code="curl_failed"
-
-  # Читаємо JSON відповіді незалежно від того, успішний це статус чи ні.
-  response="$(cat "$tmp_response_file")"
-  rm -f "$tmp_response_file"
-
-  if [[ "$http_code" == "200" ]]; then
-    # Для успішної відповіді витягуємо id Selenium session і CDP URL браузера.
-    SESSION_ID="$(jq -r '.value.sessionId // empty' <<<"$response")"
-    CDP_URL="$(jq -r '.value.capabilities["se:cdp"] // empty' <<<"$response")"
-    if [[ -n "$SESSION_ID" && -n "$CDP_URL" ]]; then
-      log "Created Selenium session on attempt ${attempt}."
-      break
-    fi
-    # Іноді Selenium відповідає 200, але ще не повертає повні capabilities; це теж повторюємо.
-    log "Selenium session response on attempt ${attempt} did not contain session metadata."
-    log "$response"
-  else
-    # Для неуспішного статусу залишаємо в логах HTTP-код і відповідь сервера.
-    log "Selenium session creation attempt ${attempt} failed with status ${http_code}."
-    if [[ -n "$response" ]]; then
-      log "$response"
-    fi
-  fi
-
-  # Даємо Selenium короткий час на стабілізацію перед наступною спробою.
-  sleep 2
-done
-
-# Якщо не вдалося отримати session id або CDP URL, далі запускати Playwright немає сенсу.
-if [[ -z "$SESSION_ID" || -z "$CDP_URL" ]]; then
-  log "Unable to resolve Selenium session metadata after retries."
-  exit 1
-fi
-
-cleanup() {
-  if [[ -n "${SESSION_ID:-}" ]]; then
-    # Закриваємо Selenium session навіть після падіння Maven, щоб не залишати "висячі" браузери.
-    curl --silent --show-error --fail-with-body \
-      --request DELETE \
-      --url "http://127.0.0.1:4444/session/${SESSION_ID}" >/dev/null || true
-  fi
-}
-
-trap cleanup EXIT
-
-# Selenium повертає внутрішню адресу контейнера, тому переписуємо її на localhost runner-а.
-CDP_PATH="${CDP_URL#ws://*/}"
-export E2E_SELENIUM_CDP_URL="ws://127.0.0.1:4444/${CDP_PATH}"
-export E2E_ARTIFACTS_DIR="${E2E_ARTIFACTS_DIR:-target/e2e-artifacts}"
-
-# Логуємо ключові параметри перед стартом Maven, щоб легше діагностувати CI-запуск.
-log "Resolved Playwright CDP endpoint: ${E2E_SELENIUM_CDP_URL}"
-log "Starting Maven E2E UI test run."
-
-# Запускаємо Maven-профіль E2E UI і одночасно пишемо консольний вивід у CI-лог.
-set -o pipefail
-mvn -B -P e2e-ui -Dcheckstyle.skip=true -DskipUnitTests=true -DskipIntegrationTests=true verify \
-  | tee -a "$LOG_FILE"
+      - name: Upload E2E reports and media
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-ui-test-artifacts
+          path: |
+            target/failsafe-reports/**
+            target/ci-logs/**
+            target/e2e-artifacts/**
+          if-no-files-found: warn
