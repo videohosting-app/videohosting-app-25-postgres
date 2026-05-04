@@ -1,0 +1,64 @@
+name: E2E UI Tests Run
+
+on:
+  workflow_call:
+    inputs:
+      application_url:
+        description: Deployed application base URL for UI tests
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      application_url:
+        description: Deployed application base URL for UI tests
+        required: true
+        type: string
+
+jobs:
+  e2e-ui-tests:
+    name: Run E2E UI Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      selenium:
+        image: selenium/standalone-chromium:latest
+        ports:
+          - 4444:4444
+        options: >-
+          --shm-size=2gb
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y jq curl
+
+      - name: Run E2E UI tests
+        shell: bash
+        env:
+          E2E_BASE_URL: ${{ inputs.application_url }}
+          E2E_ARTIFACTS_DIR: target/e2e-artifacts
+          MAVEN_OPTS: "-Xmx2048m"
+        run: |
+          chmod +x .github/workflows/scripts/run-e2e-test.sh
+          ./.github/workflows/scripts/run-e2e-test.sh
+
+      - name: Upload E2E reports and media
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-ui-test-artifacts
+          path: |
+            target/failsafe-reports/**
+            target/ci-logs/**
+            target/e2e-artifacts/**
+          if-no-files-found: warn

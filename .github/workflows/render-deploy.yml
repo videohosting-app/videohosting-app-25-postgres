@@ -1,8 +1,12 @@
 name: Render Deploy
 
 on:
-# Дозволяє викликати workflow з інших workflow, наприклад із CI для деплою з pull request.  
+  # Дозволяє викликати workflow з інших workflow, наприклад із CI для деплою з pull request.
   workflow_call:
+    outputs:
+      application_url:
+        description: Deployed application base URL
+        value: ${{ jobs.deploy.outputs.application_url }}
 
   # Дозволяє вручну запустити деплой із вказаним тегом образу Docker-контейнера.
   workflow_dispatch:
@@ -23,12 +27,14 @@ jobs:
   deploy:
     name: Deploy to Render
     runs-on: ubuntu-latest
+    outputs:
+      application_url: ${{ steps.service.outputs.application_url }}
     # Реальний деплой виконується для виклику з pull request, ручного запуску або після успішного CI в main.
     if: >
       github.event_name == 'workflow_dispatch' ||
       github.event_name == 'pull_request' ||
       (github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.head_branch == 'main')
+       github.event.workflow_run.head_branch == 'main')
     # Надає доступ до читання вмісту репозиторію.
     permissions:
       contents: read
@@ -146,3 +152,34 @@ jobs:
 
           printf 'Timed out waiting for Render deploy %s to finish.\n' "$DEPLOY_ID" >&2
           exit 1
+
+      - name: Resolve deployed application URL
+        id: service
+        shell: bash
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+        run: |
+          response="$(
+            curl --silent --show-error --fail-with-body \
+              --request GET \
+              --url "https://api.render.com/v1/services/${RENDER_SERVICE_ID}" \
+              --header "Authorization: Bearer ${RENDER_API_KEY}"
+          )"
+
+          application_url="$(
+            jq -r '
+              .service.serviceDetails.url //
+              .serviceDetails.url //
+              .service.url //
+              .url //
+              empty
+            ' <<<"$response"
+          )"
+
+          if [[ -z "$application_url" ]]; then
+            printf 'Unable to resolve deployed application URL from Render service response.\n%s\n' "$response" >&2
+            exit 1
+          fi
+
+          echo "application_url=${application_url}" >> "$GITHUB_OUTPUT"
