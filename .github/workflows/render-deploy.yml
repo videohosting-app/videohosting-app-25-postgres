@@ -179,4 +179,4 @@ jobs:
           fi
 
           echo "application_url=${application_url}" >> "$GITHUB_OUTPUT"
-          exit 1
+          # exit 1
