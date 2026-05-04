@@ -78,3 +78,4 @@ jobs:
             printf '%s\n' "$IMAGE_TAGS"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          } >> "$GITHUB_STEP_SUMMARY"

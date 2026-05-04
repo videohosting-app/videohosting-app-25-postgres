@@ -1,12 +1,8 @@
 name: Render Deploy
 
 on:
-  # Дозволяє викликати workflow з інших workflow, наприклад із CI для деплою з pull request.
+# Дозволяє викликати workflow з інших workflow, наприклад із CI для деплою з pull request.  
   workflow_call:
-    outputs:
-      application_url:
-        description: Deployed application base URL
-        value: ${{ jobs.deploy.outputs.application_url }}
 
   # Дозволяє вручну запустити деплой із вказаним тегом образу Docker-контейнера.
   workflow_dispatch:
@@ -34,7 +30,7 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       github.event_name == 'pull_request' ||
       (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.head_branch == 'main')
+      github.event.workflow_run.head_branch == 'main')
     # Надає доступ до читання вмісту репозиторію.
     permissions:
       contents: read
@@ -183,3 +179,4 @@ jobs:
           fi
 
           echo "application_url=${application_url}" >> "$GITHUB_OUTPUT"
+          exit 1
