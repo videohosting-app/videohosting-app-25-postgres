@@ -36,7 +36,9 @@
                 <td th:text="${viewInfo.producerCountry}"></td>
                 <td th:text="${viewInfo.videoRating}"></td>
                 <td th:text="${viewInfo.platform}"></td>
-                <td>
+                <td class="d-flex gap-1">
+                    <!-- Нова кнопка редагування -->
+                    <a th:href="@{/edit/{id}(id=${viewInfo.id})}" class="btn btn-warning btn-sm">Редагувати</a>
                     <form th:action="@{/delete/{id}(id=${viewInfo.id})}" method="post">
                         <button type="submit" class="btn btn-danger btn-sm">Видалити</button>
                     </form>

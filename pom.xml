@@ -7,7 +7,7 @@
   <name>videohosting</name>
   <url>http://maven.apache.org</url>
 
-   <!-- Кодування збірки та ресурсів -->
+  <!-- Кодування збірки та ресурсів -->
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -15,11 +15,13 @@
     <maven.compiler.target>17</maven.compiler.target>
     <project.scm.id>github</project.scm.id>
     <testcontainers.version>1.21.4</testcontainers.version>
+    <playwright.version>1.55.0</playwright.version>
     <skipUnitTests>false</skipUnitTests>
     <skipIntegrationTests>false</skipIntegrationTests>
+    <skipE2ETests>false</skipE2ETests>
   </properties>
 
-   <!-- Інформація про SCM -->
+  <!-- Інформація про SCM -->
   <scm>
     <connection>scm:git:https://github.com/videohosting-app/videohosting-app-25-postgres.git</connection>
     <developerConnection>scm:git:https://github.com/videohosting-app/videohosting-app-25-postgres.git</developerConnection>
@@ -61,6 +63,14 @@
         <version>${testcontainers.version}</version>
         <scope>test</scope>
     </dependency>
+
+    <dependency>
+        <groupId>com.microsoft.playwright</groupId>
+        <artifactId>playwright</artifactId>
+        <version>${playwright.version}</version>
+        <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <distributionManagement>
@@ -118,6 +128,7 @@
           <skipTests>${skipUnitTests}</skipTests>
           <excludes>
             <exclude>**/*IntegrationTests.java</exclude>
+            <exclude>**/*E2ETests.java</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -282,4 +293,34 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>e2e-ui</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>3.5.1</version>
+            <configuration>
+              <useModulePath>false</useModulePath>
+              <skipITs>${skipE2ETests}</skipITs>
+              <includes>
+                <include>**/*E2ETests.java</include>
+              </includes>
+            </configuration>
+            <executions>
+              <execution>
+                <id>run-e2e-ui-tests</id>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

@@ -1,14 +1,6 @@
 package com.videohost;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +9,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -118,5 +117,64 @@ class VideohostingFlowIntegrationTests {
             .andExpect(redirectedUrl("/"));
 
         assertThat(viewInfoRepository.findById(saved.getId())).isEmpty();
+    }
+
+    @Test
+    void editPageRendersFormWithExistingViewInfoModel() throws Exception {
+        ViewInfo saved = viewInfoRepository.save(new ViewInfo(
+            "Коваленко Олег Іванович",
+            "Петренко Ірина Василівна",
+            "2024-09-14",
+            "20:30:00",
+            "Весняний ранок",
+            "00:15:45",
+            "Драма",
+            "Україна",
+            8.7,
+            "VideoHub"
+        ));
+
+        mockMvc.perform(get("/edit/{id}", saved.getId()))
+            .andExpect(status().isOk())
+            .andExpect(view().name("edit"))
+            .andExpect(model().attributeExists("viewInfo"))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Весняний ранок")));
+    }
+
+    @Test
+    void editEndpointUpdatesPersistedViewInfoInMongo() throws Exception {
+        ViewInfo saved = viewInfoRepository.save(new ViewInfo(
+            "Коваленко Олег Іванович",
+            "Петренко Ірина Василівна",
+            "2024-09-14",
+            "20:30:00",
+            "Весняний ранок",
+            "00:15:45",
+            "Драма",
+            "Україна",
+            8.7,
+            "VideoHub"
+        ));
+
+        mockMvc.perform(post("/edit/{id}", saved.getId())
+                .param("viewer", "Іваненко Марія Петрівна")
+                .param("producer", "Петренко Ірина Василівна")
+                .param("watchedDate", "2024-10-01")
+                .param("watchedTime", "18:00:00")
+                .param("videoTitle", "Оновлена Назва")
+                .param("videoDuration", "00:20:00")
+                .param("genre", "Комедія")
+                .param("producerCountry", "Польща")
+                .param("videoRating", "9.1")
+                .param("platform", "Netflix"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/"));
+
+        ViewInfo updated = viewInfoRepository.findById(saved.getId()).orElseThrow();
+        assertThat(updated.getViewer()).isEqualTo("Іваненко Марія Петрівна");
+        assertThat(updated.getVideoTitle()).isEqualTo("Оновлена Назва");
+        assertThat(updated.getVideoRating()).isEqualTo(9.1);
+        assertThat(updated.getGenre()).isEqualTo("Комедія");
+        assertThat(updated.getPlatform()).isEqualTo("Netflix");
     }
 }
