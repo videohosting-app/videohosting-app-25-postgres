@@ -102,6 +102,7 @@ class VideohostingHappyPathE2ETests {
         }
     }
 
+    // Happy-path тест: створення і видалення запису.
     @Test
     void videohostingHappyPathCreatesAndDeletesEntry() {
         runWithDiagnostics("videohosting-happy-path-creates-and-deletes-entry", () -> {
@@ -110,12 +111,11 @@ class VideohostingHappyPathE2ETests {
             String uniqueViewer = "E2E Viewer " + uniqueSuffix;
             createdVideoTitle = uniqueVideoTitle;
 
-            // Переходимо на сторінку додавання запису.
+            // Переходимо на сторінку додавання і заповнюємо форму.
             page.navigate(baseUrl + "/add");
             waitForAddPageForm();
             assertThat(page.locator("form").count()).isEqualTo(1);
 
-            // Заповнюємо форму тестовими даними.
             setInputValue("viewer", uniqueViewer);
             setInputValue("producer", "E2E Producer");
             setInputValue("watchedDate", "2026-05-04");
@@ -127,24 +127,91 @@ class VideohostingHappyPathE2ETests {
             setInputValue("videoRating", "8.5");
             setInputValue("platform", "E2E Platform");
 
-            // Відправляємо форму і чекаємо повернення на головну сторінку.
+            // Відправляємо форму і перевіряємо появу запису в таблиці.
             page.locator("button[type='submit']").click();
             page.waitForURL(baseUrl + "/");
             waitForVideohostingPageHeader();
 
-            // Перевіряємо, що запис з'явився в таблиці.
             Locator createdRow = waitForRowContaining(uniqueVideoTitle,
                 "Created videohosting row did not appear on the main page.");
             assertThat(createdRow.textContent())
                 .contains(uniqueViewer)
                 .contains(uniqueVideoTitle);
 
-            // Видаляємо запис.
+            // Видаляємо створений запис.
             deleteVideohostRow(uniqueVideoTitle);
             createdVideoTitle = null;
         });
     }
 
+    // Happy-path тест: створення, редагування і видалення запису.
+    @Test
+    void videohostingHappyPathEditsEntry() {
+        runWithDiagnostics("videohosting-happy-path-edits-entry", () -> {
+            String uniqueSuffix = String.valueOf(Instant.now().toEpochMilli());
+            String uniqueVideoTitle = "E2E Edit Video " + uniqueSuffix;
+            String uniqueViewer = "E2E Edit Viewer " + uniqueSuffix;
+            String updatedVideoTitle = "E2E Edited Video " + uniqueSuffix;
+            String updatedViewer = "E2E Edited Viewer " + uniqueSuffix;
+            createdVideoTitle = updatedVideoTitle;
+
+            // Крок 1: створюємо новий запис через форму додавання.
+            page.navigate(baseUrl + "/add");
+            waitForAddPageForm();
+
+            setInputValue("viewer", uniqueViewer);
+            setInputValue("producer", "Edit Producer");
+            setInputValue("watchedDate", "2026-05-04");
+            setInputValue("watchedTime", "18:00");
+            setInputValue("videoTitle", uniqueVideoTitle);
+            setInputValue("videoDuration", "02:00:00");
+            setInputValue("genre", "Comedy");
+            setInputValue("producerCountry", "Poland");
+            setInputValue("videoRating", "7.0");
+            setInputValue("platform", "Edit Platform");
+
+            page.locator("button[type='submit']").click();
+            page.waitForURL(baseUrl + "/");
+            waitForVideohostingPageHeader();
+
+            // Крок 2: перевіряємо що запис з'явився і натискаємо "Редагувати".
+            Locator createdRow = waitForRowContaining(uniqueVideoTitle,
+                "Created row did not appear before editing.");
+            assertThat(createdRow.textContent()).contains(uniqueVideoTitle);
+
+            createdRow.locator("a.btn-warning").click();
+            waitForEditPageForm();
+            assertThat(page.locator("form").count()).isEqualTo(1);
+
+            // Крок 3: змінюємо дані в формі редагування.
+            clearAndSetInputValue("viewer", updatedViewer);
+            clearAndSetInputValue("videoTitle", updatedVideoTitle);
+            clearAndSetInputValue("genre", "Thriller");
+            clearAndSetInputValue("videoRating", "9.2");
+
+            // Крок 4: зберігаємо зміни і перевіряємо що оновлений запис з'явився в таблиці.
+            page.locator("button[type='submit']").click();
+            page.waitForURL(baseUrl + "/");
+            waitForVideohostingPageHeader();
+
+            Locator updatedRow = waitForRowContaining(updatedVideoTitle,
+                "Updated videohosting row did not appear on the main page.");
+            assertThat(updatedRow.textContent())
+                .contains(updatedViewer)
+                .contains(updatedVideoTitle)
+                .contains("Thriller")
+                .contains("9.2");
+
+            // Крок 5: перевіряємо що старий заголовок більше не відображається.
+            assertThat(page.locator("body").textContent()).doesNotContain(uniqueVideoTitle);
+
+            // Крок 6: видаляємо оновлений запис.
+            deleteVideohostRow(updatedVideoTitle);
+            createdVideoTitle = null;
+        });
+    }
+
+    // Видаляє рядок із таблиці за назвою відео і перевіряє що він зник.
     private void deleteVideohostRow(String uniqueVideoTitle) {
         page.navigate(baseUrl + "/");
         waitForVideohostingPageHeader();
@@ -163,11 +230,13 @@ class VideohostingHappyPathE2ETests {
         assertThat(page.locator("body").textContent()).doesNotContain(uniqueVideoTitle);
     }
 
+    // Чекає появи рядка з потрібним текстом і повертає знайдений locator.
     private Locator waitForRowContaining(String text, String failureMessage) {
         waitFor(() -> findRowContaining(text) != null, failureMessage);
         return findRowContaining(text);
     }
 
+    // Шукає перший рядок таблиці, у тексті якого міститься потрібне значення.
     private Locator findRowContaining(String text) {
         Locator rows = page.locator("tbody tr");
         int count = rows.count();
@@ -181,10 +250,19 @@ class VideohostingHappyPathE2ETests {
         return null;
     }
 
+    // Заповнює input-поле за його HTML name-атрибутом.
     private void setInputValue(String fieldName, String value) {
         page.locator("[name='" + fieldName + "']").fill(value);
     }
 
+    // Очищає поле і встановлює нове значення (для форми редагування з уже заповненими полями).
+    private void clearAndSetInputValue(String fieldName, String value) {
+        Locator input = page.locator("[name='" + fieldName + "']");
+        input.clear();
+        input.fill(value);
+    }
+
+    // Чекає поки на головній сторінці з'явиться заголовок таблиці відеохостингу.
     private void waitForVideohostingPageHeader() {
         page.locator("h1")
             .filter(new Locator.FilterOptions().setHasText(VIDEOHOSTING_PAGE_TITLE))
@@ -194,6 +272,7 @@ class VideohostingHappyPathE2ETests {
                 .setTimeout((double) pageReadyTimeoutMillis));
     }
 
+    // Чекає поки сторінка додавання повністю відрендерить форму.
     private void waitForAddPageForm() {
         page.locator("form")
             .first()
@@ -202,6 +281,24 @@ class VideohostingHappyPathE2ETests {
                 .setTimeout((double) pageReadyTimeoutMillis));
     }
 
+    // Чекає поки сторінка редагування повністю відрендерить форму.
+    private void waitForEditPageForm() {
+        page.locator("form")
+            .first()
+            .waitFor(new Locator.WaitForOptions()
+                .setState(WaitForSelectorState.VISIBLE)
+                .setTimeout((double) pageReadyTimeoutMillis));
+        // Додатково переконуємось що поле videoTitle вже містить дані (форма заповнена).
+        waitFor(
+            () -> {
+                String value = page.locator("[name='videoTitle']").inputValue();
+                return value != null && !value.isBlank();
+            },
+            "Edit form did not pre-populate videoTitle field."
+        );
+    }
+
+    // Простий polling helper для умов що не мають зручного вбудованого wait у Playwright.
     private void waitFor(BooleanSupplier condition, String failureMessage) {
         long deadline = System.currentTimeMillis() + WAIT_TIMEOUT_MILLIS;
         while (System.currentTimeMillis() < deadline) {
@@ -285,7 +382,8 @@ class VideohostingHappyPathE2ETests {
         try {
             Files.createDirectories(directory);
         } catch (Exception exception) {
-            throw new IllegalStateException("Unable to create E2E artifacts directory " + directory, exception);
+            throw new IllegalStateException(
+                "Unable to create E2E artifacts directory " + directory, exception);
         }
     }
 
